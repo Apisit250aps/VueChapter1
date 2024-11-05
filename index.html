@@ -9,7 +9,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <style>
         .hero-section {
             background: linear-gradient(135deg, #6B73FF 0%, #000DFF 100%);
@@ -50,12 +49,46 @@
             position: relative;
         }
 
-        .preview-iframe {
-            width: 100%;
-            height: 100%;
+        .preview-frame {
+            width: 150%;
+            height: 150%;
             border: none;
-            transform: scale(0.7);
+            transform: scale(0.75) translate(-15%, -15%);
             transform-origin: 0 0;
+            pointer-events: none;
+        }
+
+        .preview-loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #f8f9fa;
+        }
+
+        .preview-error {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #f8f9fa;
+            flex-direction: column;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .preview-error i {
+            font-size: 2rem;
+            color: #dc3545;
+            margin-bottom: 0.5rem;
         }
 
         .preview-overlay {
@@ -64,7 +97,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.1);
+            background: rgba(0, 0, 0, 0.2);
             display: none;
             justify-content: center;
             align-items: center;
@@ -102,15 +135,8 @@
             color: white;
         }
 
-        .code-preview {
-            width: 100%;
-            height: 200px;
-            overflow: auto;
-            background-color: #f8f9fa;
-            border-radius: 15px 15px 0 0;
-            padding: 1rem;
-            font-family: monospace;
-            font-size: 0.875rem;
+        body {
+            padding-top: 56px;
         }
     </style>
 </head>
@@ -121,7 +147,7 @@
         <nav class="navbar navbar-expand-lg navbar-light fixed-top">
             <div class="container">
                 <a class="navbar-brand" href="#">
-                    <i class="fas fa-code me-2"></i>{{ message }}
+                    <i class="fas fa-code me-2"></i>[{ message }]
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
@@ -134,7 +160,7 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="featuresDropdown" role="button"
                                 data-bs-toggle="dropdown" aria-expanded="false">
-                                Leaning
+                                Learning
                             </a>
                             <ul class="dropdown-menu dropdown-menu-animated" aria-labelledby="featuresDropdown">
                                 <li><a class="dropdown-item" href="/src/pages/binding.html">
@@ -156,8 +182,8 @@
         <!-- Hero Section -->
         <section class="hero-section">
             <div class="container text-center">
-                <h1 class="display-4 fw-bold mb-4">{{ message }}</h1>
-                <p class="lead mb-4">Welcome {{ name }}</p>
+                <h1 class="display-4 fw-bold mb-4">[{ message }]</h1>
+                <p class="lead mb-4">Welcome [{ name }]</p>
                 <button class="btn btn-light btn-lg px-4 me-2">Get Started</button>
                 <button class="btn btn-outline-light btn-lg px-4">Learn More</button>
             </div>
@@ -169,24 +195,39 @@
             <div class="row">
                 <div v-for="(app, index) in apps" :key="index" class="col-md-4">
                     <div class="card feature-card">
-                        <!-- Preview Container -->
                         <div class="preview-container">
-                            <!-- HTML Preview -->
-                            <div v-if="app.html" class="code-preview" v-html="app.html"></div>
-                            <!-- iframe for external URLs -->
-                            <iframe v-else 
-                                    :src="app.url" 
-                                    class="preview-iframe" 
-                                    :title="app.title"
-                                    sandbox="allow-scripts allow-same-origin">
-                            </iframe>
-                            <div class="preview-overlay">
+                            <!-- Loading State -->
+                            <div v-if="app.loading" class="preview-loading">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Error State -->
+                            <div v-else-if="app.error" class="preview-error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <p>Failed to load preview</p>
+                            </div>
+                            
+                            <!-- Website Preview -->
+                            <iframe 
+                                v-else
+                                :src="app.url"
+                                class="preview-frame"
+                                :title="app.title"
+                                @load="app.loading = false"
+                                @error="handleError(app)"
+                                sandbox="allow-scripts allow-same-origin"
+                            ></iframe>
+                            
+                            <!-- Overlay with Visit Button -->
+                            <div class="preview-overlay" @click="visitApp(app.url)">
                                 <span class="btn btn-light">View Full App</span>
                             </div>
                         </div>
                         <div class="card-body">
-                            <h3 class="app-title">{{ app.title }}</h3>
-                            <p class="app-description">{{ app.description }}</p>
+                            <h3 class="app-title">[{ app.title }]</h3>
+                            <p class="app-description">[{ app.description }]</p>
                             <a :href="app.url" target="_blank" class="visit-btn">
                                 Visit App <i class="fas fa-external-link-alt ms-2"></i>
                             </a>
@@ -200,6 +241,7 @@
     <script>
         const { createApp } = Vue;
         createApp({
+            delimiters: ['[{', '}]'],
             data() {
                 return {
                     message: 'CHAPTER 1',
@@ -208,55 +250,35 @@
                         {
                             url: 'https://apisit250aps.github.io/VueChapter1/',
                             title: 'Home',
-                            description: 'Main application homepage',
-                            html: `
-                                <div style="padding: 20px; text-align: center;">
-                                    <h1 style="color: #000DFF;">Vue Chapter 1</h1>
-                                    <p>Welcome to the main application!</p>
-                                    <button style="background: #000DFF; color: white; border: none; padding: 10px 20px; border-radius: 5px;">
-                                        Get Started
-                                    </button>
-                                </div>
-                            `
+                            description: 'Start your Vue.js journey here',
+                            loading: true,
+                            error: false
                         },
                         {
                             url: 'https://apisit250aps.github.io/DUCKWEB/',
                             title: 'Counter App',
-                            description: 'A simple counter application built with Vue.js',
-                            html: `
-                                <div style="padding: 20px; text-align: center;">
-                                    <h2 style="margin-bottom: 20px;">Counter: 0</h2>
-                                    <button style="background: #000DFF; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin: 5px;">
-                                        Increment
-                                    </button>
-                                    <button style="background: #DC3545; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin: 5px;">
-                                        Decrement
-                                    </button>
-                                </div>
-                            `
+                            description: 'Interactive counter application with Vue.js',
+                            loading: true,
+                            error: false
                         },
                         {
                             url: '/src/pages/binding.html',
                             title: 'Binding Tutorial',
                             description: 'Learn about data binding in Vue.js',
-                            html: `
-                                <div style="padding: 20px;">
-                                    <h3 style="color: #000DFF;">Vue.js Data Binding</h3>
-                                    <div style="margin: 15px 0;">
-                                        <label>Input:</label>
-                                        <input type="text" 
-                                               style="border: 1px solid #ccc; padding: 5px; border-radius: 4px;"
-                                               placeholder="Type something...">
-                                    </div>
-                                    <p>Output: <span style="color: #000DFF;">{{ message }}</span></p>
-                                </div>
-                            `
+                            loading: true,
+                            error: false
                         }
                     ]
                 };
             },
-            mounted() {
-                console.log('App is running!');
+            methods: {
+                handleError(app) {
+                    app.loading = false;
+                    app.error = true;
+                },
+                visitApp(url) {
+                    window.open(url, '_blank');
+                }
             }
         }).mount('#app')
     </script>
