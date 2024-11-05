@@ -22,6 +22,19 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        *::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Hide scrollbar for IE, Edge and Firefox */
+        * {
+            -ms-overflow-style: none;
+            /* IE and Edge */
+            scrollbar-width: none;
+            /* Firefox */
+        }
+
         .navbar-brand {
             font-weight: bold;
             color: #000DFF !important;
@@ -164,7 +177,7 @@
                             </a>
                             <ul class="dropdown-menu dropdown-menu-animated" aria-labelledby="featuresDropdown">
                                 <li><a class="dropdown-item" href="/src/pages/binding.html">
-                                    <i class="fas fa-star me-2"></i>Binding</a>
+                                        <i class="fas fa-star me-2"></i>Binding</a>
                                 </li>
                             </ul>
                         </li>
@@ -172,7 +185,8 @@
                             <a class="nav-link" href="#">About</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" target="_blank" href="https://apisit250aps.github.io/DUCKWEB/">Counter</a>
+                            <a class="nav-link" target="_blank"
+                                href="https://apisit250aps.github.io/DUCKWEB/">Counter</a>
                         </li>
                     </ul>
                 </div>
@@ -202,24 +216,17 @@
                                     <span class="visually-hidden">Loading...</span>
                                 </div>
                             </div>
-                            
+
                             <!-- Error State -->
                             <div v-else-if="app.error" class="preview-error">
                                 <i class="fas fa-exclamation-circle"></i>
                                 <p>Failed to load preview</p>
                             </div>
-                            
+
                             <!-- Website Preview -->
-                            <iframe 
-                                v-else
-                                :src="app.url"
-                                class="preview-frame"
-                                :title="app.title"
-                                @load="app.loading = false"
-                                @error="handleError(app)"
-                                sandbox="allow-scripts allow-same-origin"
-                            ></iframe>
-                            
+                            <iframe v-else :src="app.url" class="preview-frame" :title="app.title"
+                                sandbox="allow-scripts allow-same-origin"></iframe>
+
                             <!-- Overlay with Visit Button -->
                             <div class="preview-overlay" @click="visitApp(app.url)">
                                 <span class="btn btn-light">View Full App</span>
@@ -248,25 +255,22 @@
                     name: 'Vue.js Developer',
                     apps: [
                         {
-                            url: 'https://apisit250aps.github.io/VueChapter1/',
+                            url: '/',
                             title: 'Home',
                             description: 'Start your Vue.js journey here',
-                            loading: true,
-                            error: false
+
                         },
                         {
                             url: 'https://apisit250aps.github.io/DUCKWEB/',
                             title: 'Counter App',
                             description: 'Interactive counter application with Vue.js',
-                            loading: true,
-                            error: false
+
                         },
                         {
-                            url: 'https://apisit250aps.github.io/VueChapter1/pages/binding.html',
+                            url: '/pages/binding.html',
                             title: 'Binding Tutorial',
                             description: 'Learn about data binding in Vue.js',
-                            loading: true,
-                            error: false
+
                         }
                     ]
                 };
