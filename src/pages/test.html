@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+
+<body>
+    <main id="app">
+        {{message}}
+        <form action="">
+            <input type="text" v-model="message">
+            <button type="submit" @click="print">Submit</button>
+        </form>
+    </main>
+    <script>
+        const { createApp, ref } = Vue;
+        createApp(
+            {
+                setup() {
+                    let message = ref("");
+                    const print = () => {
+                        alert(message.value);
+                    };
+                    return {
+                        message,
+                        print
+                    };
+                }
+            }
+        ).mount("#app")
+    </script>
+</body>
+
+</html>
