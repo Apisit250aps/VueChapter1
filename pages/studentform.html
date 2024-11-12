@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แบบฟอร์มลงทะเบียน</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container mt-5" id="app">
+        <div class="card"  data-aos="fade-up">
+            <div class="card-header">
+                <h3>แบบฟอร์มลงทะเบียน</h3>
+            </div>
+            <div class="card-body">
+                <form @submit.prevent="submitForm" novalidate>
+                    <div class="row g-3">
+                        <!-- ชื่อ -->
+                        <div class="col-md-6">
+                            <label class="form-label">ชื่อ *</label>
+                            <input type="text" class="form-control" :class="{'is-invalid': errors.firstName}"
+                                v-model="form.firstName" required>
+                            <div class="invalid-feedback">กรุณากรอกชื่อ</div>
+                        </div>
+
+                        <!-- นามสกุล -->
+                        <div class="col-md-6">
+                            <label class="form-label">นามสกุล *</label>
+                            <input type="text" class="form-control" :class="{'is-invalid': errors.lastName}"
+                                v-model="form.lastName" required>
+                            <div class="invalid-feedback">กรุณากรอกนามสกุล</div>
+                        </div>
+
+                        <!-- เบอร์โทร -->
+                        <div class="col-md-6">
+                            <label class="form-label">เบอร์โทร *</label>
+                            <input type="text" class="form-control" :class="{'is-invalid': errors.phone}"
+                                v-model="form.phone" maxlength="10" required>
+                            <div class="invalid-feedback">
+                                {{ errors.phone || 'กรุณากรอกเบอร์โทรให้ถูกต้อง (ขึ้นต้นด้วย 0 และมี 10 หลัก)' }}
+                            </div>
+                        </div>
+
+                        <!-- รหัสนักศึกษา -->
+                        <div class="col-md-6">
+                            <label class="form-label">รหัสนักศึกษา *</label>
+                            <input type="text" class="form-control" :class="{'is-invalid': errors.studentId}"
+                                v-model="form.studentId" maxlength="10" required>
+                            <div class="invalid-feedback">
+                                {{ errors.studentId || 'กรุณากรอกรหัสนักศึกษา 10 หลัก' }}
+                            </div>
+                        </div>
+
+                        <!-- หมายเลขบัตรประชาชน -->
+                        <div class="col-md-6">
+                            <label class="form-label">เลขบัตรประชาชน *</label>
+                            <input type="text" class="form-control" :class="{'is-invalid': errors.idCard}"
+                                v-model="form.idCard" maxlength="13" required>
+                            <div class="invalid-feedback">
+                                {{ errors.idCard || 'กรุณากรอกเลขบัตรประชาชน 13 หลัก' }}
+                            </div>
+                        </div>
+
+                        <!-- อีเมล -->
+                        <div class="col-md-6">
+                            <label class="form-label">อีเมล *</label>
+                            <input type="email" class="form-control" :class="{'is-invalid': errors.email}"
+                                v-model="form.email" required>
+                            <div class="invalid-feedback">
+                                {{ errors.email || 'กรุณากรอกอีเมลให้ถูกต้อง' }}
+                            </div>
+                        </div>
+
+                        <!-- ที่อยู่ -->
+                        <div class="col-12">
+                            <label class="form-label">ที่อยู่ *</label>
+                            <textarea class="form-control" :class="{'is-invalid': errors.address}"
+                                v-model="form.address" rows="3" required></textarea>
+                            <div class="invalid-feedback">กรุณากรอกที่อยู่</div>
+                        </div>
+
+                        <!-- ปุ่มส่งฟอร์ม -->
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">บันทึกข้อมูล</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@3.3.4/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        const { createApp } = Vue;
+        AOS.init();
+        createApp({
+            data() {
+                return {
+                    form: {
+                        firstName: '',
+                        lastName: '',
+                        phone: '',
+                        studentId: '',
+                        idCard: '',
+                        email: '',
+                        address: ''
+                    },
+                    errors: {}
+                };
+            },
+            methods: {
+                validateForm() {
+                    this.errors = {};
+
+                    // ตรวจสอบชื่อ
+                    if (!this.form.firstName.trim()) {
+                        this.errors.firstName = true;
+                    }
+
+                    // ตรวจสอบนามสกุล
+                    if (!this.form.lastName.trim()) {
+                        this.errors.lastName = true;
+                    }
+
+                    // ตรวจสอบเบอร์โทร
+                    const phoneRegex = /^0\d{9}$/;
+                    if (!phoneRegex.test(this.form.phone)) {
+                        this.errors.phone = 'เบอร์โทรต้องขึ้นต้นด้วย 0 และมี 10 หลัก';
+                    }
+
+                    // ตรวจสอบรหัสนักศึกษา
+                    const studentIdRegex = /^\d{10}$/;
+                    if (!studentIdRegex.test(this.form.studentId)) {
+                        this.errors.studentId = 'รหัสนักศึกษาต้องเป็นตัวเลข 10 หลัก';
+                    }
+
+                    // ตรวจสอบเลขบัตรประชาชน
+                    const idCardRegex = /^\d{13}$/;
+                    if (!idCardRegex.test(this.form.idCard)) {
+                        this.errors.idCard = 'เลขบัตรประชาชนต้องเป็นตัวเลข 13 หลัก';
+                    }
+
+                    // ตรวจสอบอีเมล
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(this.form.email)) {
+                        this.errors.email = 'กรุณากรอกอีเมลให้ถูกต้อง';
+                    }
+
+                    // ตรวจสอบที่อยู่
+                    if (!this.form.address.trim()) {
+                        this.errors.address = true;
+                    }
+
+                    return Object.keys(this.errors).length === 0;
+                },
+                submitForm() {
+                    if (this.validateForm()) {
+                        Swal.fire({
+                            title: "สำเร็จ!",
+                            text: "บันทึกข้อมูลสำเร็จ!",
+                            icon: "success"
+                        });
+                        console.log(this.form);
+                    }
+                }
+            }
+        }).mount('#app')
+    </script>
+</body>
+
+</html>
